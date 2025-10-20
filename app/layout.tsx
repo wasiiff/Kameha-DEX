@@ -3,7 +3,7 @@ import { Providers } from "./providers/provider";
 import Header from "./components/Layout/Header";
 
 export const metadata = {
-  title: "Kaspa Finance",
+  title: "Kasplex Finance",
   description: "DEX + Faucet + NFT marketplace on Kasplex Testnet"
 };
 

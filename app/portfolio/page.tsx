@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAccount, useReadContract } from "wagmi";
 import { formatEther } from "viem";
+    import Link from 'next/link';
 import {
   Wallet,
   TrendingUp,
@@ -87,6 +88,11 @@ const TOKENS = [
     accentColor: "text-yellow-400",
   },
 ];
+// -------------------------
+// IPFS Metadata
+// -------------------------
+const METADATA_CID = "bafybeigyhsxoh6fisvp75syx7cai2rzdgsthhlztdaxk5wvwibdxc3j3i4";
+
 
 /* -------------------------
    Helpers: safe formatting
@@ -172,6 +178,10 @@ export default function PortfolioPage() {
   // Refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nftMetadata, setNftMetadata] = useState<
+  { tokenId: number; name?: string; description?: string; image?: string }[]
+>([]);
+
 
   // --- Read token balances using wagmi hooks (three separate reads, but throttled by enabled) ---
   const { data: bA, refetch: refetchA } = useReadContract({
@@ -229,6 +239,35 @@ export default function PortfolioPage() {
       setError("Failed to read balances.");
     }
   }, [address, bA, bB, bC, nftBalRaw]);
+  useEffect(() => {
+  if (nftCount === 0) return;
+
+  const fetchMetadata = async () => {
+    const results: typeof nftMetadata = [];
+
+    for (let i = 1; i <= nftCount; i++) {
+      try {
+        const res = await fetch(`https://ipfs.io/ipfs/${METADATA_CID}/${i}.json`);
+        const json = await res.json();
+
+        // fix image IPFS links
+        if (json.image?.startsWith("ipfs://")) {
+          json.image = json.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+        }
+
+        results.push({ tokenId: i, ...json });
+      } catch (err) {
+        console.error(`Failed to fetch metadata for NFT #${i}`, err);
+        results.push({ tokenId: i }); // fallback
+      }
+    }
+
+    setNftMetadata(results);
+  };
+
+  fetchMetadata();
+}, [nftCount]);
+
 
   // Derived values (memoized)
   const totalTokensWei = useMemo(() => {
@@ -469,12 +508,12 @@ export default function PortfolioPage() {
                   </div>
                 </div>
                 <div>
-                  <a
-                    href="/marketplace"
+                  <Link
+                    href="/nft"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300"
                   >
                     <Sparkles className="w-4 h-4" /> Browse Marketplace
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -493,20 +532,32 @@ export default function PortfolioPage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* For now we show placeholders — fetch tokenIDs via an indexer or tokenOfOwnerByIndex when available */}
-                  {Array.from({ length: nftCount }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-slate-800/40 rounded-2xl overflow-hidden border border-slate-700/50"
-                    >
-                      <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                        <div className="text-slate-300">NFT #{i + 1}</div>
-                      </div>
-                      <div className="p-4">
-                        <div className="text-white font-bold">NFT #{i + 1}</div>
-                        <div className="text-xs text-slate-400 mt-2">Owned</div>
-                      </div>
-                    </div>
-                  ))}
+                 {nftMetadata.map((nft) => (
+  <div
+    key={nft.tokenId}
+    className="bg-slate-800/40 rounded-2xl overflow-hidden border border-slate-700/50"
+  >
+    <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+      {nft.image ? (
+        <img
+          src={nft.image}
+          alt={nft.name || `NFT #${nft.tokenId}`}
+          className="w-full h-full object-cover"
+          onError={(e) =>
+            (e.currentTarget.src = `https://via.placeholder.com/400/1e293b/94a3b8?text=NFT+%23${nft.tokenId}`)
+          }
+        />
+      ) : (
+        <div className="text-slate-400">Loading...</div>
+      )}
+    </div>
+    <div className="p-4">
+      <div className="text-white font-bold">{nft.name || `NFT #${nft.tokenId}`}</div>
+      {nft.description && <div className="text-xs text-slate-400 mt-1 line-clamp-2">{nft.description}</div>}
+    </div>
+  </div>
+))}
+
                 </div>
               )}
             </div>
@@ -572,7 +623,7 @@ export default function PortfolioPage() {
                   </a>
                   <a
                     className="block text-sm text-slate-300 hover:text-white"
-                    href="/marketplace"
+                    href="/nft"
                   >
                     → Browse NFT marketplace
                   </a>
@@ -584,7 +635,7 @@ export default function PortfolioPage() {
                   </a>
                   <a
                     className="block text-sm text-slate-300 hover:text-white"
-                    href="/list"
+                    href="/nft"
                   >
                     → List your NFTs for sale
                   </a>

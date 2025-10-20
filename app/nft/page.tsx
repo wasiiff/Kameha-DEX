@@ -1,25 +1,25 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  useAccount, 
-  useReadContract, 
-  useWriteContract, 
-  useWaitForTransactionReceipt 
+import {
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
 } from "wagmi";
-import { 
-  ShoppingCart, 
-  Wallet, 
-  RefreshCw, 
-  CheckCircle2, 
-  AlertCircle, 
+import {
+  ShoppingCart,
+  Wallet,
+  RefreshCw,
+  CheckCircle2,
+  AlertCircle,
   Sparkles,
   Grid3x3,
   Filter,
   Loader2,
   ExternalLink,
   Tag,
-  User
+  User,
 } from "lucide-react";
 import { formatEther, parseEther } from "viem";
 
@@ -36,30 +36,30 @@ const MARKETPLACE_ABI = [
     stateMutability: "nonpayable",
     inputs: [
       { name: "tokenId", type: "uint256" },
-      { name: "priceInTokenA", type: "uint256" }
+      { name: "priceInTokenA", type: "uint256" },
     ],
-    outputs: []
+    outputs: [],
   },
   {
     name: "buyWithTokenA",
     type: "function",
     stateMutability: "nonpayable",
     inputs: [{ name: "tokenId", type: "uint256" }],
-    outputs: []
+    outputs: [],
   },
   {
     name: "buyWithTokenB",
     type: "function",
     stateMutability: "nonpayable",
     inputs: [{ name: "tokenId", type: "uint256" }],
-    outputs: []
+    outputs: [],
   },
   {
     name: "buyWithTokenC",
     type: "function",
     stateMutability: "nonpayable",
     inputs: [{ name: "tokenId", type: "uint256" }],
-    outputs: []
+    outputs: [],
   },
   {
     name: "getListing",
@@ -69,8 +69,8 @@ const MARKETPLACE_ABI = [
     outputs: [
       { name: "seller", type: "address" },
       { name: "price", type: "uint256" },
-      { name: "active", type: "bool" }
-    ]
+      { name: "active", type: "bool" },
+    ],
   },
   {
     name: "calculatePriceInToken",
@@ -78,10 +78,10 @@ const MARKETPLACE_ABI = [
     stateMutability: "view",
     inputs: [
       { name: "tokenId", type: "uint256" },
-      { name: "paymentToken", type: "address" }
+      { name: "paymentToken", type: "address" },
     ],
-    outputs: [{ name: "", type: "uint256" }]
-  }
+    outputs: [{ name: "", type: "uint256" }],
+  },
 ];
 
 const ERC20_ABI = [
@@ -91,9 +91,9 @@ const ERC20_ABI = [
     stateMutability: "nonpayable",
     inputs: [
       { name: "spender", type: "address" },
-      { name: "amount", type: "uint256" }
+      { name: "amount", type: "uint256" },
     ],
-    outputs: [{ type: "bool" }]
+    outputs: [{ type: "bool" }],
   },
   {
     name: "allowance",
@@ -101,17 +101,17 @@ const ERC20_ABI = [
     stateMutability: "view",
     inputs: [
       { name: "owner", type: "address" },
-      { name: "spender", type: "address" }
+      { name: "spender", type: "address" },
     ],
-    outputs: [{ type: "uint256" }]
+    outputs: [{ type: "uint256" }],
   },
   {
     name: "balanceOf",
     type: "function",
     stateMutability: "view",
     inputs: [{ name: "account", type: "address" }],
-    outputs: [{ type: "uint256" }]
-  }
+    outputs: [{ type: "uint256" }],
+  },
 ];
 
 const NFT_ABI = [
@@ -120,38 +120,39 @@ const NFT_ABI = [
     type: "function",
     stateMutability: "view",
     inputs: [{ name: "tokenId", type: "uint256" }],
-    outputs: [{ type: "address" }]
-  }
+    outputs: [{ type: "address" }],
+  },
 ];
 
 const TOKENS = [
-  { 
-    address: TOKEN_A_ADDRESS, 
-    symbol: "PLAT", 
-    name: "Platinum Token", 
+  {
+    address: TOKEN_A_ADDRESS,
+    symbol: "PLAT",
+    name: "Platinum Token",
     gradient: "from-slate-400 via-slate-300 to-slate-500",
-    icon: "💎"
+    icon: "💎",
   },
-  { 
-    address: TOKEN_B_ADDRESS, 
-    symbol: "SIMP", 
-    name: "Simple Token", 
+  {
+    address: TOKEN_B_ADDRESS,
+    symbol: "SIMP",
+    name: "Simple Token",
     gradient: "from-blue-400 via-cyan-300 to-blue-500",
-    icon: "🔷"
+    icon: "🔷",
   },
-  { 
-    address: TOKEN_C_ADDRESS, 
-    symbol: "LMN", 
-    name: "Lemon Token", 
+  {
+    address: TOKEN_C_ADDRESS,
+    symbol: "LMN",
+    name: "Lemon Token",
     gradient: "from-yellow-400 via-amber-300 to-yellow-500",
-    icon: "🍋"
-  }
+    icon: "🍋",
+  },
 ];
 
 // NFT Card Component
 function NFTCard({ tokenId, selectedToken, onRefresh }) {
   const { address, isConnected } = useAccount();
   const [processingStage, setProcessingStage] = useState("idle");
+  const [metadata, setMetadata] = useState<{ name?: string; image?: string; description?: string } | null>(null);
 
   // Listing info
   const { data: listingData, refetch: refetchListing } = useReadContract({
@@ -159,23 +160,26 @@ function NFTCard({ tokenId, selectedToken, onRefresh }) {
     abi: MARKETPLACE_ABI,
     functionName: "getListing",
     args: [BigInt(tokenId)],
-    query: { refetchInterval: 10000 }
+    query: { refetchInterval: 10000 },
   });
 
-  const listing = listingData ? {
-    seller: listingData[0],
-    price: listingData[1],
-    active: listingData[2]
-  } : null;
+  const listing = listingData
+    ? {
+        seller: listingData[0],
+        price: listingData[1],
+        active: listingData[2],
+      }
+    : null;
 
-  // NFT owner (to disable buying own NFT)
-  const { data: nftOwner } = useReadContract({
-    address: NFT_ADDRESS,
-    abi: NFT_ABI,
-    functionName: "ownerOf",
-    args: [BigInt(tokenId)],
-    query: { enabled: !!listing?.active }
-  });
+  // NFT owner
+const { data: nftOwner, refetch: refetchNFTOwner } = useReadContract({
+  address: NFT_ADDRESS,
+  abi: NFT_ABI,
+  functionName: "ownerOf",
+  args: [BigInt(tokenId)],
+  query: { enabled: !!listing?.active },
+});
+
 
   // Price
   const { data: calculatedPrice } = useReadContract({
@@ -183,15 +187,16 @@ function NFTCard({ tokenId, selectedToken, onRefresh }) {
     abi: MARKETPLACE_ABI,
     functionName: "calculatePriceInToken",
     args: [BigInt(tokenId), selectedToken.address],
-    query: { enabled: !!listing?.active }
+    query: { enabled: !!listing?.active },
   });
 
+  // Allowance & Balance
   const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
     address: selectedToken.address,
     abi: ERC20_ABI,
     functionName: "allowance",
     args: [address!, MARKETPLACE_ADDRESS],
-    query: { enabled: !!address }
+    query: { enabled: !!address },
   });
 
   const { data: balanceData } = useReadContract({
@@ -199,19 +204,52 @@ function NFTCard({ tokenId, selectedToken, onRefresh }) {
     abi: ERC20_ABI,
     functionName: "balanceOf",
     args: [address!],
-    query: { enabled: !!address }
+    query: { enabled: !!address },
   });
 
   const allowance = (allowanceData as bigint) || 0n;
   const balance = (balanceData as bigint) || 0n;
-  const needsApproval = calculatedPrice && allowance < (calculatedPrice as bigint);
-  const hasInsufficientBalance = calculatedPrice && balance < (calculatedPrice as bigint);
+  const needsApproval =
+    calculatedPrice && allowance < (calculatedPrice as bigint);
+  const hasInsufficientBalance =
+    calculatedPrice && balance < (calculatedPrice as bigint);
 
+  // Write Contracts
   const { writeContract: approve, data: approveTx } = useWriteContract();
   const { isSuccess: approveSuccess } = useWaitForTransactionReceipt({ hash: approveTx });
 
-  const { writeContract: buy, data: buyTx, error: buyError } = useWriteContract();
+  const { writeContract: buy, data: buyTx } = useWriteContract();
   const { isSuccess: buySuccess } = useWaitForTransactionReceipt({ hash: buyTx });
+
+  // Fetch Metadata from tokenURI
+  const { data: tokenURI } = useReadContract({
+    address: NFT_ADDRESS,
+    abi: NFT_ABI,
+    functionName: "tokenURI",
+    args: [BigInt(tokenId)],
+  });
+
+useEffect(() => {
+  if (!tokenId) return;
+
+  const tokenURI = `https://ipfs.io/ipfs/bafybeigyhsxoh6fisvp75syx7cai2rzdgsthhlztdaxk5wvwibdxc3j3i4/${tokenId}.json`;
+
+  fetch(tokenURI)
+    .then((res) => res.json())
+    .then((json) => {
+      if (json.image?.startsWith("ipfs://") || /^[a-zA-Z0-9]{46,}$/i.test(json.image)) {
+        if (json.image.startsWith("ipfs://")) {
+          json.image = json.image.replace("ipfs://", "https://ipfs.io/ipfs/");
+        } else {
+          json.image = `https://ipfs.io/ipfs/${json.image}`;
+        }
+      }
+      setMetadata(json);
+    })
+    .catch((err) => console.error("Metadata fetch failed:", err));
+}, [tokenId]);
+
+
 
   const handleApprove = () => {
     if (!calculatedPrice) return;
@@ -220,20 +258,23 @@ function NFTCard({ tokenId, selectedToken, onRefresh }) {
       address: selectedToken.address as `0x${string}`,
       abi: ERC20_ABI,
       functionName: "approve",
-      args: [MARKETPLACE_ADDRESS, (calculatedPrice as bigint) * 2n]
+      args: [MARKETPLACE_ADDRESS, (calculatedPrice as bigint) * 2n],
     });
   };
 
   const handleBuy = () => {
     setProcessingStage("buying");
     const fn =
-      selectedToken.address === TOKEN_A_ADDRESS ? "buyWithTokenA" :
-      selectedToken.address === TOKEN_B_ADDRESS ? "buyWithTokenB" : "buyWithTokenC";
+      selectedToken.address === TOKEN_A_ADDRESS
+        ? "buyWithTokenA"
+        : selectedToken.address === TOKEN_B_ADDRESS
+        ? "buyWithTokenB"
+        : "buyWithTokenC";
     buy({
       address: MARKETPLACE_ADDRESS as `0x${string}`,
       abi: MARKETPLACE_ABI,
       functionName: fn,
-      args: [BigInt(tokenId)]
+      args: [BigInt(tokenId)],
     });
   };
 
@@ -245,44 +286,60 @@ function NFTCard({ tokenId, selectedToken, onRefresh }) {
     }
   }, [approveSuccess]);
 
-  useEffect(() => {
-    if (buySuccess) {
-      setProcessingStage("success");
-      setTimeout(() => {
-        setProcessingStage("idle");
-        refetchListing();
-        onRefresh();
-      }, 3000);
-    }
-  }, [buySuccess]);
+useEffect(() => {
+  if (buySuccess) {
+    setProcessingStage("success");
+
+    // Refetch both listing and NFT owner immediately
+    refetchListing();
+    if (refetchNFTOwner) refetchNFTOwner(); // add this refetch for ownerOf
+
+    setTimeout(() => {
+      setProcessingStage("idle");
+      onRefresh();
+    }, 1000); // reduce delay for UX
+  }
+}, [buySuccess]);
+
 
   if (!listing?.active) return null;
 
   const isOwnNFT = nftOwner?.toLowerCase() === address?.toLowerCase();
-  const priceFormatted = calculatedPrice ? parseFloat(formatEther(calculatedPrice as bigint)).toFixed(4) : "0";
+  const priceFormatted = calculatedPrice
+    ? parseFloat(formatEther(calculatedPrice as bigint)).toFixed(4)
+    : "0";
 
   return (
     <div className="bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-slate-800/60 overflow-hidden hover:border-slate-700/80 transition-all hover:scale-[1.02] group">
       <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-        <img
-          src={`/nft-images/${tokenId}.jpg`}
-          alt={`NFT #${tokenId}`}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          onError={(e) => {
-            e.currentTarget.src = `https://via.placeholder.com/400/1e293b/94a3b8?text=NFT+%23${tokenId}`;
-          }}
-        />
+        {metadata?.image ? (
+          <img
+            src={metadata.image}
+            alt={metadata.name || `NFT #${tokenId}`}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            onError={(e) => {
+              e.currentTarget.src = `https://via.placeholder.com/400/1e293b/94a3b8?text=NFT+%23${tokenId}`;
+            }}
+          />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full text-slate-500 text-sm">
+            Loading metadata...
+          </div>
+        )}
+
         <div className="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-sm border border-slate-700/50">
           <span className="text-white text-xs font-bold">#{tokenId}</span>
         </div>
       </div>
 
       <div className="p-5 space-y-3">
-        <h3 className="text-lg font-bold text-white">NFT #{tokenId}</h3>
+        <h3 className="text-lg font-bold text-white">{metadata?.name || `NFT #${tokenId}`}</h3>
+        {metadata?.description && (
+          <p className="text-slate-400 text-sm line-clamp-2">{metadata.description}</p>
+        )}
+
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-white truncate">
-            {priceFormatted}
-          </span>
+          <span className="text-xl font-bold text-white truncate">{priceFormatted}</span>
           <span className="text-sm text-slate-400">{selectedToken.symbol}</span>
         </div>
 
@@ -313,16 +370,137 @@ function NFTCard({ tokenId, selectedToken, onRefresh }) {
             )}
           </div>
         ) : (
-          <button disabled className="w-full bg-slate-800/60 text-slate-500 py-3 rounded-xl font-semibold cursor-not-allowed">
+          <button
+            disabled
+            className="w-full bg-slate-800/60 text-slate-500 py-3 rounded-xl font-semibold cursor-not-allowed"
+          >
             Connect Wallet
           </button>
         )}
 
         <div className="pt-3 border-t border-slate-800/60 flex items-center gap-2 text-xs text-slate-400">
           <User className="w-3.5 h-3.5" />
-          <span>{listing.seller.slice(0, 6)}...{listing.seller.slice(-4)}</span>
+          <span>
+            {listing.seller.slice(0, 6)}...{listing.seller.slice(-4)}
+          </span>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ----------------------
+// Mint NFT Component
+// ----------------------
+function MintNFTSection() {
+  const { address, isConnected } = useAccount();
+  const [mintTo, setMintTo] = useState("");
+  const [tokenURI, setTokenURI] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
+
+  const NFT_ABI = [
+    {
+      name: "mintTo",
+      type: "function",
+      stateMutability: "nonpayable",
+      inputs: [
+        { name: "to", type: "address" },
+        { name: "tokenURI_", type: "string" },
+      ],
+      outputs: [{ type: "uint256" }],
+    },
+    {
+      name: "owner",
+      type: "function",
+      stateMutability: "view",
+      inputs: [],
+      outputs: [{ type: "address" }],
+    },
+  ];
+
+  const { data: owner } = useReadContract({
+    address: NFT_ADDRESS,
+    abi: NFT_ABI,
+    functionName: "owner",
+  });
+
+  useEffect(() => {
+    if (owner && address)
+      setIsOwner(owner.toLowerCase() === address.toLowerCase());
+  }, [owner, address]);
+
+  const {
+    writeContract: mintNFT,
+    data: mintTx,
+    isPending: mintPending,
+    error: mintError,
+  } = useWriteContract();
+  const { isSuccess: mintSuccess } = useWaitForTransactionReceipt({
+    hash: mintTx,
+  });
+
+  const handleMint = () => {
+    if (!mintTo || !tokenURI) return;
+    mintNFT({
+      address: NFT_ADDRESS as `0x${string}`,
+      abi: NFT_ABI,
+      functionName: "mintTo",
+      args: [mintTo, tokenURI],
+    });
+  };
+
+  if (!isConnected || !isOwner) return null;
+
+  return (
+    <div className="bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-slate-800/60 p-6 mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-purple-400" />
+          <h3 className="text-lg font-bold text-white">Mint New NFT</h3>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4">
+        <input
+          type="text"
+          placeholder="Recipient address"
+          value={mintTo}
+          onChange={(e) => setMintTo(e.target.value)}
+          className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-purple-500/50"
+        />
+        <input
+          type="text"
+          placeholder="Metadata URI (e.g. ipfs://...)"
+          value={tokenURI}
+          onChange={(e) => setTokenURI(e.target.value)}
+          className="bg-slate-800/50 border border-slate-700/50 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:ring-2 focus:ring-purple-500/50"
+        />
+        <button
+          onClick={handleMint}
+          disabled={mintPending}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+        >
+          {mintPending ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Sparkles className="w-4 h-4" />
+          )}
+          {mintPending ? "Minting..." : "Mint NFT"}
+        </button>
+      </div>
+
+      {mintError && (
+        <div className="mt-3 bg-red-900/40 border border-red-500/50 rounded-lg p-3 flex items-start gap-2 text-red-300 text-sm">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          {mintError.message}
+        </div>
+      )}
+      {mintSuccess && (
+        <div className="mt-3 bg-emerald-900/30 border border-emerald-500/50 rounded-lg p-3 text-emerald-300 text-sm flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4" />
+          NFT Minted Successfully!
+        </div>
+      )}
     </div>
   );
 }
@@ -335,8 +513,15 @@ export default function NftMarketplacePage() {
   const [tokenIdToList, setTokenIdToList] = useState("");
   const [priceToList, setPriceToList] = useState("");
 
-  const { writeContract: listNFT, data: listTx, error: listError, isPending: listPending } = useWriteContract();
-  const { isSuccess: listSuccess } = useWaitForTransactionReceipt({ hash: listTx });
+  const {
+    writeContract: listNFT,
+    data: listTx,
+    error: listError,
+    isPending: listPending,
+  } = useWriteContract();
+  const { isSuccess: listSuccess } = useWaitForTransactionReceipt({
+    hash: listTx,
+  });
 
   const handleListNFT = () => {
     if (!tokenIdToList || !priceToList) return;
@@ -344,7 +529,7 @@ export default function NftMarketplacePage() {
       address: MARKETPLACE_ADDRESS as `0x${string}`,
       abi: MARKETPLACE_ABI,
       functionName: "listNFT",
-      args: [BigInt(tokenIdToList), parseEther(priceToList)]
+      args: [BigInt(tokenIdToList), parseEther(priceToList)],
     });
   };
 
@@ -352,7 +537,7 @@ export default function NftMarketplacePage() {
     if (listSuccess) {
       setTokenIdToList("");
       setPriceToList("");
-      setRefreshKey(prev => prev + 1);
+      setRefreshKey((prev) => prev + 1);
     }
   }, [listSuccess]);
 
@@ -365,7 +550,9 @@ export default function NftMarketplacePage() {
         <div className="text-center mb-12 pt-8">
           <div className="inline-flex items-center gap-2 bg-slate-900/60 backdrop-blur-sm px-5 py-2.5 rounded-full border border-slate-800/60 mb-6">
             <Sparkles className="w-4 h-4 text-purple-400" />
-            <span className="text-slate-300 text-sm font-medium">NFT Marketplace</span>
+            <span className="text-slate-300 text-sm font-medium">
+              NFT Marketplace
+            </span>
           </div>
           <h1 className="text-6xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent">
             Collect NFTs
@@ -374,6 +561,9 @@ export default function NftMarketplacePage() {
             Discover, collect, and trade unique digital assets on Kaspa Finance
           </p>
         </div>
+
+        {/* Mint NFT Section (Owner Only) */}
+        <MintNFTSection />
 
         {/* List NFT Section */}
         {isConnected && (
@@ -384,7 +574,7 @@ export default function NftMarketplacePage() {
                 <h3 className="text-lg font-bold text-white">List Your NFT</h3>
               </div>
               <button
-                onClick={() => setRefreshKey(prev => prev + 1)}
+                onClick={() => setRefreshKey((prev) => prev + 1)}
                 className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -412,7 +602,11 @@ export default function NftMarketplacePage() {
                 disabled={listPending}
                 className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
               >
-                {listPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                {listPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
                 {listPending ? "Listing..." : "List NFT"}
               </button>
             </div>
@@ -446,15 +640,17 @@ export default function NftMarketplacePage() {
                 className={`p-4 rounded-xl border transition-all ${
                   selectedToken.address === token.address
                     ? `border-transparent bg-gradient-to-r ${token.gradient} shadow-lg`
-                    : 'border-slate-700/50 bg-slate-800/40 hover:bg-slate-800/60 hover:border-slate-700'
+                    : "border-slate-700/50 bg-slate-800/40 hover:bg-slate-800/60 hover:border-slate-700"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-2xl ${
-                    selectedToken.address === token.address 
-                      ? 'bg-white/20' 
-                      : `bg-gradient-to-br ${token.gradient}`
-                  }`}>
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-2xl ${
+                      selectedToken.address === token.address
+                        ? "bg-white/20"
+                        : `bg-gradient-to-br ${token.gradient}`
+                    }`}
+                  >
                     {token.icon}
                   </div>
                   <div className="text-left">
@@ -470,11 +666,11 @@ export default function NftMarketplacePage() {
         {/* NFT Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {tokenIds.map((id) => (
-            <NFTCard 
+            <NFTCard
               key={`${id}-${refreshKey}`}
-              tokenId={id} 
+              tokenId={id}
               selectedToken={selectedToken}
-              onRefresh={() => setRefreshKey(prev => prev + 1)}
+              onRefresh={() => setRefreshKey((prev) => prev + 1)}
             />
           ))}
         </div>
@@ -482,8 +678,12 @@ export default function NftMarketplacePage() {
         {!isConnected && (
           <div className="text-center py-16 mt-8 bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-slate-800/60">
             <Wallet className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">Connect Your Wallet</h3>
-            <p className="text-slate-400">Connect your wallet to view and purchase NFTs</p>
+            <h3 className="text-xl font-bold text-white mb-2">
+              Connect Your Wallet
+            </h3>
+            <p className="text-slate-400">
+              Connect your wallet to view and purchase NFTs
+            </p>
           </div>
         )}
       </div>
