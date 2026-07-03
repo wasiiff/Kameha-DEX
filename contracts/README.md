@@ -4,6 +4,27 @@ This document lists every on-chain contract the Kameha-DEX frontend interacts wi
 
 All contracts are deployed on the **Kasplex Testnet**.
 
+## Folder Structure
+
+```
+contracts/
+├── README.md          # this file
+├── metadata.json      # network + deployment metadata (addresses ↔ ABIs ↔ sources)
+├── addresses.ts       # typed address registry imported by the frontend
+├── abi/               # JSON ABIs (viem/ethers/web3 compatible)
+│   ├── ERC20.json
+│   ├── TripleSwap.json
+│   ├── Faucet.json
+│   ├── KamehaNFT.json
+│   └── Marketplace.json
+└── src/               # reference Solidity implementations
+    ├── ERC20Token.sol
+    ├── TripleSwap.sol
+    ├── Faucet.sol
+    ├── KamehaNFT.sol
+    └── Marketplace.sol
+```
+
 ## Network
 
 | Field | Value |
@@ -18,29 +39,58 @@ Defined in [`app/lib/wagmiClient.ts`](../app/lib/wagmiClient.ts).
 
 ## Contract Addresses
 
-| Contract | Address | ABI | Used In |
+| Contract | Address | ABI (JSON) | Used In |
 | --- | --- | --- | --- |
-| DEX (TripleSwap) | `0xE0AdC4976bfbd0b59eBba32047F0B17756621EBd` | [`DEX_ABI.ts`](../app/lib/abis/DEX_ABI.ts) | [`app/dex/page.tsx`](../app/dex/page.tsx), [`app/liquidity/page.tsx`](../app/liquidity/page.tsx) |
-| Faucet | `0x607D41d416304C0440ED374377AC0AA839d254AA` | [`Faucet_ABI.ts`](../app/lib/abis/Faucet_ABI.ts) | [`app/faucet/page.tsx`](../app/faucet/page.tsx) |
-| NFT (ERC-721) | `0xDA47f9cB54F34BbF1988bD6263634CF8F4816DB2` | [`NFT_ABI.ts`](../app/lib/abis/NFT_ABI.ts) | [`app/nft/page.tsx`](../app/nft/page.tsx), [`app/portfolio/page.tsx`](../app/portfolio/page.tsx) |
-| Marketplace | `0xcf1731f89A0E4e5Af0e2EB8b433E1De66e7E0FD0` | [`Marketplace_ABI.ts`](../app/lib/abis/Marketplace_ABI.ts) | [`app/nft/page.tsx`](../app/nft/page.tsx) |
-| Token A — PLAT (Platinum Token) | `0x0e0Fd4B9D8B114Ee75CbC65ed80eE49F3EA45D95` | [`ERC20_ABI.ts`](../app/lib/abis/ERC20_ABI.ts) | dex, liquidity, nft, portfolio, faucet |
-| Token B — SIMP (Simple Token) | `0x26a25ACc7ad5b30f92e8B1f69Df7266b367a9b83` | [`ERC20_ABI.ts`](../app/lib/abis/ERC20_ABI.ts) | dex, liquidity, nft, portfolio, faucet |
-| Token C — LMN (Lemon Token) | `0x268c876dFf9f364d1f8Dc9e5dE0c0A8f56C286E6` | [`ERC20_ABI.ts`](../app/lib/abis/ERC20_ABI.ts) | dex, liquidity, nft, portfolio, faucet |
+| DEX (TripleSwap) | `0xE0AdC4976bfbd0b59eBba32047F0B17756621EBd` | [`abi/TripleSwap.json`](./abi/TripleSwap.json) | [`app/dex/page.tsx`](../app/dex/page.tsx), [`app/liquidity/page.tsx`](../app/liquidity/page.tsx) |
+| Faucet | `0x607D41d416304C0440ED374377AC0AA839d254AA` | [`abi/Faucet.json`](./abi/Faucet.json) | [`app/faucet/page.tsx`](../app/faucet/page.tsx) |
+| NFT (ERC-721) | `0xDA47f9cB54F34BbF1988bD6263634CF8F4816DB2` | [`abi/KamehaNFT.json`](./abi/KamehaNFT.json) | [`app/nft/page.tsx`](../app/nft/page.tsx), [`app/portfolio/page.tsx`](../app/portfolio/page.tsx) |
+| Marketplace | `0xcf1731f89A0E4e5Af0e2EB8b433E1De66e7E0FD0` | [`abi/Marketplace.json`](./abi/Marketplace.json) | [`app/nft/page.tsx`](../app/nft/page.tsx) |
+| Token A — PLAT (Platinum Token) | `0x0e0Fd4B9D8B114Ee75CbC65ed80eE49F3EA45D95` | [`abi/ERC20.json`](./abi/ERC20.json) | dex, liquidity, nft, portfolio, faucet |
+| Token B — SIMP (Simple Token) | `0x26a25ACc7ad5b30f92e8B1f69Df7266b367a9b83` | [`abi/ERC20.json`](./abi/ERC20.json) | dex, liquidity, nft, portfolio, faucet |
+| Token C — LMN (Lemon Token) | `0x268c876dFf9f364d1f8Dc9e5dE0c0A8f56C286E6` | [`abi/ERC20.json`](./abi/ERC20.json) | dex, liquidity, nft, portfolio, faucet |
 
 > A machine-readable version of the addresses and network config lives in [`addresses.ts`](./addresses.ts), which the frontend pages import from directly (single source of truth).
+
+## ABIs (JSON)
+
+Standard JSON ABIs — compatible with [viem](https://viem.sh), [ethers](https://docs.ethers.org), [web3.js](https://web3js.org) and most tooling — live in [`abi/`](./abi):
+
+| File | Contract |
+| --- | --- |
+| [`abi/ERC20.json`](./abi/ERC20.json) | PLAT / SIMP / LMN tokens |
+| [`abi/TripleSwap.json`](./abi/TripleSwap.json) | DEX |
+| [`abi/Faucet.json`](./abi/Faucet.json) | Faucet |
+| [`abi/KamehaNFT.json`](./abi/KamehaNFT.json) | NFT |
+| [`abi/Marketplace.json`](./abi/Marketplace.json) | Marketplace |
+
+Example (viem + wagmi), with `resolveJsonModule` already enabled in `tsconfig.json`:
+
+```ts
+import { CONTRACTS } from "@/contracts/addresses";
+import DEX_ABI from "@/contracts/abi/TripleSwap.json";
+
+const { data } = useReadContract({
+  address: CONTRACTS.DEX,
+  abi: DEX_ABI,
+  functionName: "getReservesAB",
+});
+```
+
+## Metadata
+
+[`metadata.json`](./metadata.json) is a single machine-readable manifest tying everything together — network config plus, for each contract, its `address`, `abi` path, `source` path, and type. Handy for deploy scripts, block-explorer verification, or generating a typed client.
 
 ## Source Code
 
 Reference Solidity implementations for each contract live in [`src/`](./src):
 
-| File | Contract | Matches |
+| File | Contract | ABI |
 | --- | --- | --- |
-| [`src/ERC20Token.sol`](./src/ERC20Token.sol) | PLAT / SIMP / LMN test tokens | `ERC20_ABI` |
-| [`src/TripleSwap.sol`](./src/TripleSwap.sol) | DEX (constant-product AMM, 3 pairs) | `DEX_ABI` |
-| [`src/Faucet.sol`](./src/Faucet.sol) | Test-token faucet | `FAUCET_ABI` |
-| [`src/KamehaNFT.sol`](./src/KamehaNFT.sol) | ERC-721 collection | `NFT_ABI` |
-| [`src/Marketplace.sol`](./src/Marketplace.sol) | NFT marketplace | `MARKETPLACE_ABI` |
+| [`src/ERC20Token.sol`](./src/ERC20Token.sol) | PLAT / SIMP / LMN test tokens | [`abi/ERC20.json`](./abi/ERC20.json) |
+| [`src/TripleSwap.sol`](./src/TripleSwap.sol) | DEX (constant-product AMM, 3 pairs) | [`abi/TripleSwap.json`](./abi/TripleSwap.json) |
+| [`src/Faucet.sol`](./src/Faucet.sol) | Test-token faucet | [`abi/Faucet.json`](./abi/Faucet.json) |
+| [`src/KamehaNFT.sol`](./src/KamehaNFT.sol) | ERC-721 collection | [`abi/KamehaNFT.json`](./abi/KamehaNFT.json) |
+| [`src/Marketplace.sol`](./src/Marketplace.sol) | NFT marketplace | [`abi/Marketplace.json`](./abi/Marketplace.json) |
 
 > ⚠️ **Reference implementations.** The verified source that produced the *deployed* bytecode at the addresses above is not part of this repository. These files are faithful reconstructions written against the ABIs — the public read/write surface matches, but internal logic (AMM fee, faucet amounts/interval, marketplace price conversion) reflects sensible defaults and may differ from the live contracts. Use them for documentation, local testing, or as a starting point for a fresh deployment — not as a guaranteed match for the on-chain code.
 

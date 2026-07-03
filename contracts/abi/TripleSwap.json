@@ -1,0 +1,95 @@
+[
+  {
+    "type": "constructor",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "_tokenA", "type": "address" },
+      { "name": "_tokenB", "type": "address" },
+      { "name": "_tokenC", "type": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "FEE_BPS",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "tokenA",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "tokenB",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "tokenC",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "addLiquidity",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "pair", "type": "uint8" },
+      { "name": "amount1", "type": "uint256" },
+      { "name": "amount2", "type": "uint256" }
+    ],
+    "outputs": [{ "type": "bool" }]
+  },
+  {
+    "type": "function",
+    "name": "swapExactInput",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "pair", "type": "uint8" },
+      { "name": "tokenIn", "type": "address" },
+      { "name": "amountIn", "type": "uint256" },
+      { "name": "minAmountOut", "type": "uint256" },
+      { "name": "recipient", "type": "address" }
+    ],
+    "outputs": [{ "name": "amountOut", "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "previewSwap",
+    "stateMutability": "view",
+    "inputs": [
+      { "name": "pair", "type": "uint8" },
+      { "name": "tokenIn", "type": "address" },
+      { "name": "amountIn", "type": "uint256" }
+    ],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "getReservesAB",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }, { "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "getReservesAC",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }, { "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "getReservesBC",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }, { "type": "uint256" }]
+  }
+]

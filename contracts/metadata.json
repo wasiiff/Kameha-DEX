@@ -1,0 +1,78 @@
+{
+  "name": "Kameha-DEX Contracts",
+  "description": "On-chain contracts used by the Kameha-DEX frontend, deployed on the Kasplex Testnet.",
+  "version": "1.0.0",
+  "solidity": "^0.8.20",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  },
+  "note": "ABIs mirror the reference Solidity implementations in ./src and the interface the frontend calls. The verified source behind the deployed bytecode is not in this repo — treat these as reference/documentation. See ./README.md.",
+  "network": {
+    "name": "Kasplex Testnet",
+    "chainId": 167012,
+    "rpcUrl": "https://rpc.kasplextest.xyz/",
+    "nativeCurrency": { "name": "Kaspa", "symbol": "KAS", "decimals": 18 },
+    "testnet": true
+  },
+  "contracts": {
+    "DEX": {
+      "name": "TripleSwap",
+      "type": "AMM",
+      "address": "0xE0AdC4976bfbd0b59eBba32047F0B17756621EBd",
+      "abi": "./abi/TripleSwap.json",
+      "source": "./src/TripleSwap.sol",
+      "description": "Constant-product AMM over three tokens exposed as pairs 1=A/B, 2=A/C, 3=B/C."
+    },
+    "Faucet": {
+      "name": "Faucet",
+      "type": "Faucet",
+      "address": "0x607D41d416304C0440ED374377AC0AA839d254AA",
+      "abi": "./abi/Faucet.json",
+      "source": "./src/Faucet.sol",
+      "description": "Dispenses a fixed amount of each test token once per claim interval."
+    },
+    "NFT": {
+      "name": "KamehaNFT",
+      "type": "ERC721",
+      "address": "0xDA47f9cB54F34BbF1988bD6263634CF8F4816DB2",
+      "abi": "./abi/KamehaNFT.json",
+      "source": "./src/KamehaNFT.sol",
+      "description": "ERC-721 NFT collection."
+    },
+    "Marketplace": {
+      "name": "Marketplace",
+      "type": "Marketplace",
+      "address": "0xcf1731f89A0E4e5Af0e2EB8b433E1De66e7E0FD0",
+      "abi": "./abi/Marketplace.json",
+      "source": "./src/Marketplace.sol",
+      "description": "List NFTs priced in Token A; buy with Token A, B or C."
+    },
+    "PLAT": {
+      "name": "Platinum Token",
+      "type": "ERC20",
+      "symbol": "PLAT",
+      "decimals": 18,
+      "address": "0x0e0Fd4B9D8B114Ee75CbC65ed80eE49F3EA45D95",
+      "abi": "./abi/ERC20.json",
+      "source": "./src/ERC20Token.sol"
+    },
+    "SIMP": {
+      "name": "Simple Token",
+      "type": "ERC20",
+      "symbol": "SIMP",
+      "decimals": 18,
+      "address": "0x26a25ACc7ad5b30f92e8B1f69Df7266b367a9b83",
+      "abi": "./abi/ERC20.json",
+      "source": "./src/ERC20Token.sol"
+    },
+    "LMN": {
+      "name": "Lemon Token",
+      "type": "ERC20",
+      "symbol": "LMN",
+      "decimals": 18,
+      "address": "0x268c876dFf9f364d1f8Dc9e5dE0c0A8f56C286E6",
+      "abi": "./abi/ERC20.json",
+      "source": "./src/ERC20Token.sol"
+    }
+  }
+}
