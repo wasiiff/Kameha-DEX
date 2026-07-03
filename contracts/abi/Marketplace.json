@@ -1,0 +1,113 @@
+[
+  {
+    "type": "constructor",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "_nft", "type": "address" },
+      { "name": "_tokenA", "type": "address" },
+      { "name": "_tokenB", "type": "address" },
+      { "name": "_tokenC", "type": "address" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "nft",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "tokenA",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "tokenB",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "tokenC",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "listNFT",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "tokenId", "type": "uint256" },
+      { "name": "priceInTokenA", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getListing",
+    "stateMutability": "view",
+    "inputs": [{ "name": "tokenId", "type": "uint256" }],
+    "outputs": [
+      { "name": "seller", "type": "address" },
+      { "name": "price", "type": "uint256" },
+      { "name": "active", "type": "bool" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "calculatePriceInToken",
+    "stateMutability": "view",
+    "inputs": [
+      { "name": "tokenId", "type": "uint256" },
+      { "name": "paymentToken", "type": "address" }
+    ],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "buyWithTokenA",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "tokenId", "type": "uint256" }],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "buyWithTokenB",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "tokenId", "type": "uint256" }],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "buyWithTokenC",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "tokenId", "type": "uint256" }],
+    "outputs": []
+  },
+  {
+    "type": "event",
+    "name": "Listed",
+    "anonymous": false,
+    "inputs": [
+      { "name": "tokenId", "type": "uint256", "indexed": true },
+      { "name": "seller", "type": "address", "indexed": true },
+      { "name": "price", "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "Sold",
+    "anonymous": false,
+    "inputs": [
+      { "name": "tokenId", "type": "uint256", "indexed": true },
+      { "name": "buyer", "type": "address", "indexed": true },
+      { "name": "paymentToken", "type": "address", "indexed": false },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ]
+  }
+]

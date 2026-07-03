@@ -8,6 +8,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { parseEther, formatEther } from "viem";
+import { CONTRACTS, TOKENS as TOKEN_ADDR } from "@/contracts/addresses";
 import { 
   ArrowDownUp, 
   Settings, 
@@ -43,10 +44,10 @@ const DEX_ABI = [
 ];
 
 // ------------------ Contract Addresses ------------------
-const DEX_ADDRESS = "0xE0AdC4976bfbd0b59eBba32047F0B17756621EBd";
-const TOKEN_A = "0x0e0Fd4B9D8B114Ee75CbC65ed80eE49F3EA45D95";
-const TOKEN_B = "0x26a25ACc7ad5b30f92e8B1f69Df7266b367a9b83";
-const TOKEN_C = "0x268c876dFf9f364d1f8Dc9e5dE0c0A8f56C286E6";
+const DEX_ADDRESS = CONTRACTS.DEX;
+const TOKEN_A = TOKEN_ADDR.PLAT;
+const TOKEN_B = TOKEN_ADDR.SIMP;
+const TOKEN_C = TOKEN_ADDR.LMN;
 
 const TOKENS = [
   { address: TOKEN_A, symbol: "PLAT", name: "Platinum Token", color: "from-gray-400 to-gray-600", icon: "💎" },
