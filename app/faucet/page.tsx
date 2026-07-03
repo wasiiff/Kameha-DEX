@@ -3,6 +3,7 @@
 import { useAccount, useContractRead, useContractWrite, useWaitForTransactionReceipt } from "wagmi";
 import { useState, useEffect } from "react";
 import { formatEther } from "viem";
+import { CONTRACTS } from "@/contracts/addresses";
 import {
   Droplet,
   Clock,
@@ -87,7 +88,7 @@ const ERC20_ABI = [
   },
 ];
 
-const FAUCET_ADDRESS = "0x607D41d416304C0440ED374377AC0AA839d254AA";
+const FAUCET_ADDRESS = CONTRACTS.FAUCET;
 
 const TOKENS = [
   { symbol: "PLAT", icon: "💎", gradient: "from-slate-400 via-slate-300 to-slate-500" },

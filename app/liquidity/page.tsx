@@ -3,6 +3,7 @@
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useState } from "react";
 import { parseEther } from "viem";
+import { CONTRACTS } from "@/contracts/addresses";
 import {
   Wallet,
   PlusCircle,
@@ -14,7 +15,7 @@ import {
   ArrowRightLeft,
 } from "lucide-react";
 
-const TRIPLE_SWAP_ADDRESS = "0xE0AdC4976bfbd0b59eBba32047F0B17756621EBd";
+const TRIPLE_SWAP_ADDRESS = CONTRACTS.DEX;
 
 const TRIPLE_SWAP_ABI = [
   {
